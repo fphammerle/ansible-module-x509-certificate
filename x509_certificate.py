@@ -115,11 +115,14 @@ def main(argv):
         save_cert(path = module.params['cert_path'], cert = cert)
         changed = True
 
+    organization_name_attrs = cert.subject.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)
+
     module.exit_json(
             changed = changed,
             cert_path =  module.params['cert_path'],
             key_path = module.params['key_path'],
             subject_common_name = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value,
+            organization_name = organization_name_attrs[0].value if len(organization_name_attrs) > 0 else None,
             )
 
     return 0
