@@ -93,26 +93,35 @@ def main(argv):
     if os.path.exists(module.params['cert_path']):
         cert = load_cert(module.params['cert_path'])
     else:
-        issuer = create_name(
+        subject = create_name(
             common_name = module.params['common_name'].decode('utf-8'),
             organization_name = module.params['organization_name'].decode('utf-8')
                 if module.params['organization_name'] else None,
             )
         cert_builder = (
             x509.CertificateBuilder()
-             .subject_name(issuer)
-             .issuer_name(issuer)
+             .subject_name(subject)
+             .issuer_name(subject)
              .public_key(key.public_key())
              .serial_number(random_serial_number())
              .not_valid_before(datetime.datetime.utcnow())
              .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days = 356 * 10))
-             # for subject key identifier see
+             # The cA boolean indicates whether the certified public key may be used
+             # to verify certificate signatures.
+             # https://tools.ietf.org/html/rfc5280.html#section-4.2.1.9
+             .add_extension(
+                 x509.BasicConstraints(ca = True, path_length = None),
+                 critical = False,
+                 )
+             # To facilitate certification path construction, this extension MUST
+             # appear in all conforming CA certificates, that is, all certificates
+             # including the basic constraints extension
              # https://tools.ietf.org/html/rfc5280.html#section-4.2.1.2
              .add_extension(
                 x509.SubjectKeyIdentifier.from_public_key(key.public_key()),
                 critical = False,
                 )
-             )
+            )
         cert = cert_builder.sign(
                 private_key = key,
                 algorithm = hashes.SHA256(),
