@@ -106,6 +106,12 @@ def main(argv):
              .serial_number(random_serial_number())
              .not_valid_before(datetime.datetime.utcnow())
              .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days = 356 * 10))
+             # for subject key identifier see
+             # https://tools.ietf.org/html/rfc5280.html#section-4.2.1.2
+             .add_extension(
+                x509.SubjectKeyIdentifier.from_public_key(key.public_key()),
+                critical = False,
+                )
              )
         cert = cert_builder.sign(
                 private_key = key,
