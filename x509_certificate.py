@@ -78,12 +78,13 @@ def main(argv):
             'common_name': {'required': True, 'type': 'str'},
             'key_path': {'required': True, 'type': 'str'},
             'organization_name': {'required': False, 'type': 'str', 'default': None},
+            'recreate_cert': {'required': False, 'type': 'bool', 'default': False},
             }
         )
 
     changed = False
 
-    if os.path.exists(module.params['key_path']):
+    if os.path.exists(module.params['key_path']) and not module.params['recreate_cert']:
         key = load_key(module.params['key_path'])
     else:
         key = create_key(module.params['key_path'])
