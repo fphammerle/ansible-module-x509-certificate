@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+  - x509_certificate:
+      key_path: 'key'
+      cert_path: 'cert'
+      common_name: test.example.com
+      organization_name: company
