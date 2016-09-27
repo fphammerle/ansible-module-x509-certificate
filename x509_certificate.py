@@ -46,7 +46,7 @@ def save_cert(path, cert):
         f.write(cert.public_bytes(
             encoding = serialization.Encoding.PEM,
             ))
-    os.chmod(path, 0600)
+    os.chmod(path, 0644)
 
 def load_key(path):
     with open(path, 'rb') as f:
